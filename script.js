@@ -1,7 +1,9 @@
 let myPlayerId = null;
 let isMyTurn = false;
 let opponentConnected = false;
-const gameRef = ref(db, 'gameState');
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const gameRef = db.ref('gameState');
 const statusMessage = document.getElementById('statusMessage');
 
 // 🧠 Assign player and monitor opponent
@@ -566,6 +568,7 @@ function resetRound() {
 }
 
 initGame();
+
 
 
 
