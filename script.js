@@ -1,3 +1,58 @@
+let myPlayerId = null;
+let isMyTurn = false;
+let opponentConnected = false;
+const gameRef = ref(db, 'gameState');
+const statusMessage = document.getElementById('statusMessage');
+
+// 🧠 Assign player and monitor opponent
+get(child(ref(db), 'gameState/players')).then(snapshot => {
+  const players = snapshot.val() || {};
+  if (!players.player1) {
+    set(child(gameRef, 'players/player1'), true);
+    myPlayerId = 1;
+  } else if (!players.player2) {
+    set(child(gameRef, 'players/player2'), true);
+    myPlayerId = 2;
+  } else {
+    alert("Game is full.");
+    return;
+  }
+
+  // Cleanup on disconnect
+  onDisconnect(child(gameRef, `players/player${myPlayerId}`)).remove();
+
+  // Set turn
+  isMyTurn = (myPlayerId === 2); // White starts
+  updateTurnDisplay();
+
+  // 🟡 Monitor players
+  const playersRef = ref(db, 'gameState/players');
+  onValue(playersRef, (snap) => {
+    const p = snap.val() || {};
+    const playerCount = Object.keys(p).length;
+    if (playerCount < 2) {
+      opponentConnected = false;
+      statusMessage.textContent = "Waiting for opponent...";
+      boardElement.style.pointerEvents = "none";
+    } else {
+      opponentConnected = true;
+      statusMessage.textContent = "";
+      boardElement.style.pointerEvents = "auto";
+      if (isMyTurn) startTimer();
+    }
+  });
+
+  // 🟢 Listen for opponent's moves
+  const moveRef = ref(db, 'gameState/lastMove');
+  onValue(moveRef, (snapshot) => {
+    const move = snapshot.val();
+    if (!move || move.by === myPlayerId) return;
+
+    movePiece(move.from.r, move.from.c, move.to.r, move.to.c, false); // false = don't send again
+    isMyTurn = true;
+    updateTurnDisplay();
+  });
+});
 console.log("script loaded"); // Confirm script runs
 const boardElement = document.getElementById('board');
 const turnDisplay = document.getElementById('turnDisplay');
@@ -119,6 +174,8 @@ function renderBoard() {
 }
 
 function onSquareClick(r, c) {
+  if (!isMyTurn && multiplayerMode) return;
+if (!opponentConnected && multiplayerMode) return; // 👈 blocks move until both players are ready
   const clickedPiece = board[r][c];
 
   // If no piece selected yet
@@ -306,9 +363,24 @@ function isPathBlocked(r1,c1,r2,c2){
   return false;
 }
 
-function movePiece(r1, c1, r2, c2) {
+function movePiece(r1, c1, r2, c2, sendMove = true) {
   const piece = board[r1][c1];
   const target = board[r2][c2];
+
+  if (sendMove && myPlayerId && multiplayerMode) {
+    const moveRef = ref(db, 'gameState/lastMove');
+    set(moveRef, {
+      from: { r: r1, c: c1 },
+      to: { r: r2, c: c2 },
+      by: myPlayerId,
+      timestamp: Date.now()
+    });
+    isMyTurn = false;
+    updateTurnDisplay();
+  }
+
+  // 🧠 Rest of your move logic below...
+  // (you already have it in your script)
 
   // Diplomat does not move when converting
   if(piece.type === 'W' && !target && (Math.abs(r2 - r1) <= 1 && Math.abs(c2 - c1) <= 1)) {
@@ -494,5 +566,6 @@ function resetRound() {
 }
 
 initGame();
+
 
 
