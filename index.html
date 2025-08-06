@@ -13,24 +13,12 @@
       margin: 0;
       padding: 0;
       <div id="statusMessage" style="text-align:center; font-weight:bold; padding:10px;"></div>
-      <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue, get, child, onDisconnect } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+      <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"></script>
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyCVzAitage74Qot2l8gGDNaEDw18px1ctg",
-  authDomain: "centurionbattles.firebaseapp.com",
-  databaseURL: "https://centurionbattles-default-rtdb.firebaseio.com",
-  projectId: "centurionbattles",
-  storageBucket: "centurionbattles.firebasestorage.app",
-  messagingSenderId: "89989561372",
-  appId: "1:89989561372:web:10134ca86f5088186673d9",
-  measurementId: "G-ZKWERS3TXH"
-};
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-</script>
+  <!-- External Game Logic -->
+  <script src="script.js"></script>
     }
     #sidePanel {
       width: 320px;
@@ -131,4 +119,5 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
