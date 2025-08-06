@@ -1,8 +1,18 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyCVzAitage74Qot2l8gGDNaEDw18px1ctg",
+  authDomain: "centurionbattles.firebaseapp.com",
+  databaseURL: "https://centurionbattles-default-rtdb.firebaseio.com",
+  projectId: "centurionbattles",
+  storageBucket: "centurionbattles.firebasestorage.app",
+  messagingSenderId: "89989561372",
+  appId: "1:89989561372:web:10134ca86f5088186673d9",
+  measurementId: "G-ZKWERS3TXH"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 let myPlayerId = null;
 let isMyTurn = false;
 let opponentConnected = false;
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 const gameRef = db.ref('gameState');
 const statusMessage = document.getElementById('statusMessage');
 
@@ -568,6 +578,7 @@ function resetRound() {
 }
 
 initGame();
+
 
 
 
